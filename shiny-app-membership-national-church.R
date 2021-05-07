@@ -31,11 +31,23 @@ municipality_list <- unique(df$KOMK)
 
 ui <- fluidPage(
   selectInput("municipality", "Choose municipality", choices = municipality_list),
+  textOutput("percent_membership"),
   plotOutput("plot_change"),
-  plotOutput("plot_age")
+  plotOutput("plot_age"),
+  plotOutput("plot_gender")
 )
 
 server <- function(input, output, session) {
+  
+  t_membership <- reactive(df %>%
+                             filter(TID == max(TID),
+                                    KOMK == input$municipality) %>%
+                             group_by(FKMED)%>%
+                             summarise(total = sum(INDHOLD)) %>%
+                             mutate(percent = round(total/sum(total) * 100, 1)) %>%
+                             filter(FKMED == "Member of National Church") %>%
+                             pull(percent))
+  
   p_change <- reactive(df %>%
                   filter(KOMK == input$municipality) %>%
                   group_by(TID, FKMED) %>%
@@ -60,9 +72,36 @@ server <- function(input, output, session) {
                   geom_col() +
                   coord_flip())
   
+  p_gender <- reactive(df %>%
+                 filter(TID == max(TID),
+                        KOMK == input$municipality,
+                        FKMED == "Member of National Church") %>%
+                 group_by(KØN) %>%
+                 summarise(total = sum(INDHOLD)) %>%
+                 mutate(percent = round(total/sum(total) * 100, 1), # Compute percentages
+                        ymax = cumsum(percent), # Compute the cumulative percentages (top of each rectangle)
+                        ymin = c(0, head(ymax, n=-1)), # Compute the bottom of each rectangle
+                        labelPosition = (ymax + ymin) / 2,
+                        label = paste0(KØN, ": ", percent, "%")) %>%
+                 ggplot(., aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=KØN)) +
+                 geom_rect() +
+                 geom_text(x=1.25, aes(y=labelPosition, label=label), size=4) +
+                 scale_fill_brewer(palette=3) +
+                 scale_color_brewer(palette=3) +
+                 coord_polar(theta="y") + # Try to remove that to understand how the chart is built initially
+                 xlim(c(-1, 4)) + # Try to remove that to see how to make a pie chart
+                 theme_void() +
+                 theme(legend.position = "none"))
+  
+  output$percent_membership <- renderText({
+    paste("Share af the population that are members of the National Church: ", t_membership(), "%")
+    })
+  
   output$plot_change <- renderPlot(p_change(), res = 96, alt = "Alternative text")
   
   output$plot_age <- renderPlot(p_age(), res = 96, alt = "Alternative text")
+  
+  output$plot_gender <- renderPlot(p_gender(), res = 96, alt = "Alternative text")
 }
 
 shinyApp(ui, server)
