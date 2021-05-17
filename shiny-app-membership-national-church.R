@@ -29,16 +29,17 @@ df <- danstat::get_data(table_id = "KM6",
 
 municipality_list <- unique(df$KOMK)
 
-ui <- fluidPage(
+ui <- fixedPage(
+  titlePanel("Membership of the Danish national church in Copenhagen, Aarhus and Odense"),
   selectInput("municipality", "Choose municipality", choices = municipality_list),
   
   fluidRow(
-    column(6, textOutput("percent_membership")),
-    column(6, plotOutput("plot_gender"))
+    column(3, textOutput("percent_membership")),
+    column(9, plotOutput("plot_change"))
   ),
   fluidRow(
-    column(6, plotOutput("plot_change")),
-    column(6, plotOutput("plot_age"))
+    column(3, plotOutput("plot_gender")),
+    column(9, plotOutput("plot_age"))
   )
 )
 
@@ -70,10 +71,7 @@ server <- function(input, output, session) {
     mutate(percent = round(total/sum(total) * 100, 1)) %>%
     filter(FKMED == "Member of National Church") %>%
     mutate(ALDER = factor(ALDER, levels = age_levels)) %>%
-    arrange(ALDER) %>%
-    ggplot(., aes(ALDER, percent)) +
-    geom_col() +
-    coord_flip())
+    arrange(ALDER))
   
   p_gender <- reactive(filtered_df() %>%
    filter(TID == max(TID),
@@ -84,16 +82,7 @@ server <- function(input, output, session) {
           ymax = cumsum(percent), # Compute the cumulative percentages (top of each rectangle)
           ymin = c(0, head(ymax, n=-1)), # Compute the bottom of each rectangle
           labelPosition = (ymax + ymin) / 2,
-          label = paste0(KØN, ": ", percent, "%")) %>%
-   ggplot(., aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=KØN)) +
-   geom_rect() +
-   geom_text(x=1.25, aes(y=labelPosition, label=label), size=4) +
-   scale_fill_brewer(palette=3) +
-   scale_color_brewer(palette=3) +
-   coord_polar(theta="y") + # Try to remove that to understand how the chart is built initially
-   xlim(c(-1, 4)) + # Try to remove that to see how to make a pie chart
-   theme_void() +
-   theme(legend.position = "none"))
+          label = paste0(KØN, ": ", percent, "%")))
 
   output$percent_membership <- renderText({
     paste0("Share af the population that are members of the National Church: ", t_membership(), "%")
@@ -102,14 +91,33 @@ server <- function(input, output, session) {
   output$plot_change <- renderPlot({
     p_change() %>%
       ggplot(., aes(TID, percent)) +
-      geom_line()
+      geom_line() + 
+      theme_minimal()
   }, 
   res = 96, 
   alt = "Alternative text")
   
-  output$plot_age <- renderPlot(p_age(), res = 96, alt = "Alternative text")
+  output$plot_age <- renderPlot({
+    p_age() %>%
+      ggplot(., aes(ALDER, percent)) +
+      geom_col() +
+      coord_flip() +
+      theme_minimal()
+    }, res = 96, 
+    alt = "Alternative text")
   
-  output$plot_gender <- renderPlot(p_gender(), res = 96, alt = "Alternative text")
+  output$plot_gender <- renderPlot({
+    p_gender() %>%
+      ggplot(., aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=KØN)) +
+      geom_rect() +
+      geom_text(x=1.25, aes(y=labelPosition, label=label), size=4) +
+      scale_fill_brewer(palette=3) +
+      scale_color_brewer(palette=3) +
+      coord_polar(theta="y") + # Try to remove that to understand how the chart is built initially
+      xlim(c(-1, 4)) + # Try to remove that to see how to make a pie chart
+      theme_void() +
+      theme(legend.position = "none")
+  }, res = 96, alt = "Alternative text")
 }
 
 shinyApp(ui, server)
