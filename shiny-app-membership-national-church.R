@@ -3,6 +3,7 @@
 # packages ----------------------------------------------------------------
 library(danstat)
 library(shiny)
+library(htmltools)
 library(tidyverse)
 
 # import data from Statistic Denmark --------------------------------------
@@ -29,17 +30,34 @@ df <- danstat::get_data(table_id = "KM6",
 
 municipality_list <- unique(df$KOMK)
 
-ui <- fixedPage(
-  titlePanel("Membership of the Danish national church in Copenhagen, Aarhus and Odense"),
-  selectInput("municipality", "Choose municipality", choices = municipality_list),
-  
-  fluidRow(
-    column(3, textOutput("percent_membership")),
-    column(9, plotOutput("plot_change"))
+ui <- fluidPage(
+  tags$head(
+    tags$link(rel = "stylesheet", type = "text/css", href = "style.css")
   ),
-  fluidRow(
-    column(3, plotOutput("plot_gender")),
-    column(9, plotOutput("plot_age"))
+  
+  div(class="main-content",
+  
+    h1("Membership of the Danish national church in Copenhagen, Aarhus and Odense"),
+    
+    selectInput("municipality", "Choose municipality:", choices = municipality_list),
+    
+    div(class="output-container",
+        
+        div(class="narrow-output",
+            p("Share af the population that are members of the National Church:"),
+            
+            p(class="ban",
+              textOutput("percent_membership"))), 
+        
+        div(class="wide-output",
+            plotOutput("plot_change")),
+        
+        div(class="narrow-output",
+            plotOutput("plot_gender")),
+        
+        div(class="wide-output",
+            plotOutput("plot_age")),
+    )
   )
 )
 
@@ -85,7 +103,7 @@ server <- function(input, output, session) {
           label = paste0(KØN, ": ", percent, "%")))
 
   output$percent_membership <- renderText({
-    paste0("Share af the population that are members of the National Church: ", t_membership(), "%")
+    paste0(t_membership(), "%")
     })
   
   output$plot_change <- renderPlot({
