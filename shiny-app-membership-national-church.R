@@ -6,7 +6,7 @@ library(shiny)
 library(htmltools)
 library(tidyverse)
 
-# import data from Statistic Denmark --------------------------------------
+p# import data from Statistic Denmark --------------------------------------
 variables <- list(
   list(
     code = "KOMK",
@@ -39,17 +39,22 @@ ui <- fluidPage(
   
     h1("Membership of the Danish national church in Copenhagen, Aarhus and Odense"),
     
-    selectInput("municipality", "Choose municipality:", choices = municipality_list),
+    div(class="select-municipality",
+    selectInput("municipality", "Choose municipality:", choices = municipality_list, width = "100%")
+    ),
     
     div(class="output-container",
         
-        div(class="narrow-output",
-            p("Share af the population that are members of the National Church:"),
+        div(class="narrow-output center",
+            h2("Share af the population that are members of the National Church in ", textOutput("max_year")),
             
-            p(class="ban",
-              textOutput("percent_membership"))), 
+            textOutput("percent_membership")
+            ), 
         
         div(class="wide-output",
+            
+            h2("Test"),
+            
             plotOutput("plot_change")),
         
         div(class="narrow-output",
@@ -73,6 +78,11 @@ server <- function(input, output, session) {
     mutate(percent = round(total/sum(total) * 100, 1)) %>%
     filter(FKMED == "Member of National Church") %>%
     pull(percent))
+  
+  t_max_year <- reactive(filtered_df() %>%
+    filter(TID == max(TID)) %>% 
+    slice_head() %>% 
+    pull(TID))
   
   p_change <- reactive(filtered_df() %>%
     group_by(TID, FKMED) %>%
@@ -101,10 +111,14 @@ server <- function(input, output, session) {
           ymin = c(0, head(ymax, n=-1)), # Compute the bottom of each rectangle
           labelPosition = (ymax + ymin) / 2,
           label = paste0(KØN, ": ", percent, "%")))
-
+  
   output$percent_membership <- renderText({
     paste0(t_membership(), "%")
     })
+  
+  output$max_year <- renderText({
+    t_max_year()
+  })
   
   output$plot_change <- renderPlot({
     p_change() %>%
