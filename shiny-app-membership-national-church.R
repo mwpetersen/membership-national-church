@@ -37,7 +37,13 @@ ui <- fluidPage(
   
   div(class="main-content",
   
-    h1("Membership of the Danish national church in Copenhagen, Aarhus and Odense"),
+    h1("Membership of the Danish National Church in Copenhagen, Aarhus and Odense"),
+    
+    p("This dashboard shows data about membership of the Danish National Church in the three biggest municipalities 
+    in Denmark. Below you can choose which municipality data will be shown for. In the
+    dashboard you can see the overall share of the population in the chosen municipality that are members of the National 
+    church, the change in membership the last ten years, and membership broken down by gender and age group. 
+      Data is from Statistics Denmark."),
     
     div(class="select-municipality",
     selectInput("municipality", "Choose municipality:", choices = municipality_list, width = "100%")
@@ -46,22 +52,30 @@ ui <- fluidPage(
     div(class="output-container",
         
         div(class="narrow-output center",
-            h2("Share af the population that are members of the National Church in ", textOutput("max_year")),
+            h2("Share af the population in that are members of the National Church in ", textOutput("max_year_1", inline = TRUE)),
             
             textOutput("percent_membership")
             ), 
         
         div(class="wide-output",
             
-            h2("Test"),
+            h2("Change in the share of the population that are members of the National Church"),
             
             plotOutput("plot_change")),
         
         div(class="narrow-output",
-            plotOutput("plot_gender")),
+            
+            h2("Share of men and women among the members of the National Church in ", textOutput("max_year_2", inline = TRUE)),
+            
+            plotOutput("plot_gender")
+            ),
         
         div(class="wide-output",
-            plotOutput("plot_age")),
+            
+            h2("Share of different age groups that were members of the National Church in ", textOutput("max_year_3", inline = TRUE)),
+            
+            plotOutput("plot_age")
+            ),
     )
   )
 )
@@ -112,11 +126,13 @@ server <- function(input, output, session) {
           labelPosition = (ymax + ymin) / 2,
           label = paste0(KØN, ": ", percent, "%")))
   
+  output$chosen_municipality <- renderText(input$municipality)
+  
   output$percent_membership <- renderText({
     paste0(t_membership(), "%")
     })
   
-  output$max_year <- renderText({
+  output$max_year_1 <- output$max_year_2 <- output$max_year_3 <- renderText({
     t_max_year()
   })
   
