@@ -52,7 +52,7 @@ ui <- fluidPage(
     div(class="output-container",
         
         div(class="narrow-output center",
-            h2("Share af the population in that are members of the National Church in ", textOutput("max_year_1", inline = TRUE)),
+            h2("Share af the population that are members of the National Church in ", textOutput("max_year_1", inline = TRUE)),
             
             textOutput("percent_membership")
             ), 

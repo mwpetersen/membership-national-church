@@ -42,20 +42,15 @@ a:hover {
   color: #5c5c5c; /* dark grey */
 }
 
-.container-fluid {
-  border: 1px solid red;
-}
-
 .main-content {
-  width: 72%;
+  width: 95%;
   margin: 50px auto; /* Vertical  Horizontal */
   display: flex;
   flex-direction: column;
-  border: 1px solid red;
 }
 
 .select-municipality {
-  width: 33%
+  width: 100%
 }
 
 .output-container {
@@ -63,23 +58,20 @@ a:hover {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
-  border: 1px solid green;
 }
 
 .narrow-output {
-  width: 33%;
+  width: 100%;
   padding: 10px 0px 20px 0px; /* Top  Right  Bottom  Left */
   border-bottom: 1px solid #e9e9e9;
   margin-bottom: 30px;
-  border: 1px solid red;
 }
 
 .wide-output {
-  width: 62%;
+  width: 100%;
   padding: 10px 0px 20px 0px; /* Top  Right  Bottom  Left */
   border-bottom: 1px solid #e9e9e9;
   margin-bottom: 30px;
-  border: 1px solid red;
 }
 
 /* center middle child: https://www.freecodecamp.org/news/how-to-center-anything-with-css-align-a-div-text-and-more/ */
@@ -89,9 +81,55 @@ a:hover {
 
 #percent_membership {
   font-size: 4em;
-  border: 1px solid red;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+/* Phone Styles */
+@media only screen and (max-width: 450px) {
+  .center {
+    height: 400px;
+  }
+}
+
+/* Tablet Styles */
+@media only screen and (min-width: 450px) and (max-width: 960px) {
+  .main-content {
+    width: 85%;
+  }
+  .select-municipality {
+    width: 50%
+  }
+  .narrow-output {
+    width: 33%;
+  }
+  .wide-output {
+    width: 62%;
+  }
+}
+
+/* Desktop Styles */
+@media only screen and (min-width: 961px) {
+  .main-content {
+    width: 72%;
+  }
+  .select-municipality {
+    width: 33%
+  }
+  .narrow-output {
+    width: 33%;
+  }
+  .wide-output {
+    width: 62%;
+  }
+}
+
+@media only screen and (min-width: 1440px) {
+  .page {
+    width: 1440px;
+    margin: 0 auto;
+    margin-bottom: 100px;
+  }
 }
