@@ -61,20 +61,20 @@ ui <- fluidPage(
             
             h2("Change in the share of the population that are members of the National Church"),
             
-            plotOutput("plot_change")),
+            plotOutput("plot_change", width = "100%")),
         
         div(class="narrow-output",
             
             h2("Share of men and women among the members of the National Church in ", textOutput("max_year_2", inline = TRUE)),
             
-            plotOutput("plot_gender")
+            plotOutput("plot_gender", width = "100%")
             ),
         
         div(class="wide-output",
             
             h2("Share of different age groups that were members of the National Church in ", textOutput("max_year_3", inline = TRUE)),
             
-            plotOutput("plot_age")
+            plotOutput("plot_age", width = "100%")
             ),
     )
   )
