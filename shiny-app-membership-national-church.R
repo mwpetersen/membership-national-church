@@ -28,6 +28,16 @@ df <- danstat::get_data(table_id = "KM6",
                         variables = variables)
 
 
+# Set global ggplot theme -------------------------------------------------
+
+global_theme <- theme(
+  axis.text = element_text(size = 16),
+  axis.title.x = element_blank(),
+  axis.title.y = element_blank())
+
+# Shiny app ---------------------------------------------------------------
+
+
 municipality_list <- unique(df$KOMK)
 
 ui <- fluidPage(
@@ -139,10 +149,21 @@ server <- function(input, output, session) {
   output$plot_change <- renderPlot({
     p_change() %>%
       ggplot(., aes(TID, percent)) +
-      geom_line() + 
-      theme_minimal()
+      geom_line(size = 2) + 
+      scale_y_continuous(limits = c(48, 83),
+                         labels = function(x) paste0(x, "%")) +
+      scale_x_continuous(breaks = scales::breaks_extended(n = 7)) +
+      theme_minimal() +
+      global_theme + 
+      theme(
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        axis.line.x = element_line(size = 0.5)
+      ) +
+      labs(
+        caption = "Data source: Statistics Denmark"
+      ) 
   }, 
-  res = 96, 
   alt = "Alternative text")
   
   output$plot_age <- renderPlot({
@@ -150,13 +171,23 @@ server <- function(input, output, session) {
       ggplot(., aes(ALDER, percent)) +
       geom_col() +
       coord_flip() +
-      theme_minimal()
-    }, res = 96, 
+      scale_y_continuous(breaks = c(0, 20, 40, 60, 80),
+                         labels = function(x) paste0(x, "%")) +
+      theme_minimal() +
+      global_theme +
+      theme(
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        panel.grid.minor.x = element_blank()) +
+      labs(
+        caption = "Data source: Statistics Denmark"
+      )
+    }, 
     alt = "Alternative text")
   
   output$plot_gender <- renderPlot({
     p_gender() %>%
-      ggplot(., aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=KØN)) +
+      ggplot(., aes(ymax=ymax, ymin=ymin, xmax=6, xmin=5, fill=KØN)) +
       geom_rect() +
       geom_text(x=1.25, aes(y=labelPosition, label=label), size=4) +
       scale_fill_brewer(palette=3) +
@@ -165,7 +196,7 @@ server <- function(input, output, session) {
       xlim(c(-1, 4)) + # Try to remove that to see how to make a pie chart
       theme_void() +
       theme(legend.position = "none")
-  }, res = 96, alt = "Alternative text")
+  }, alt = "Alternative text")
 }
 
 shinyApp(ui, server)
