@@ -5,6 +5,7 @@ library(danstat)
 library(shiny)
 library(htmltools)
 library(tidyverse)
+library(Cairo)
 
 # import data from Statistic Denmark --------------------------------------
 variables <- list(
@@ -37,6 +38,7 @@ global_theme <- theme(
 
 # Shiny app ---------------------------------------------------------------
 
+options(shiny.usecairo=TRUE) # set graphics engine to Cairo
 
 municipality_list <- unique(df$KOMK)
 
@@ -149,7 +151,7 @@ server <- function(input, output, session) {
   output$plot_change <- renderPlot({
     p_change() %>%
       ggplot(., aes(TID, percent)) +
-      geom_line(size = 2) + 
+      geom_line(size = 2, color = "grey35") + 
       scale_y_continuous(limits = c(48, 83),
                          labels = function(x) paste0(x, "%")) +
       scale_x_continuous(breaks = scales::breaks_extended(n = 7)) +
@@ -169,7 +171,7 @@ server <- function(input, output, session) {
   output$plot_age <- renderPlot({
     p_age() %>%
       ggplot(., aes(ALDER, percent)) +
-      geom_col() +
+      geom_col(width = 0.8) +
       coord_flip() +
       scale_y_continuous(breaks = c(0, 20, 40, 60, 80),
                          labels = function(x) paste0(x, "%")) +
