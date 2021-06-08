@@ -6,7 +6,7 @@ library(shiny)
 library(htmltools)
 library(tidyverse)
 
-p# import data from Statistic Denmark --------------------------------------
+# import data from Statistic Denmark --------------------------------------
 variables <- list(
   list(
     code = "KOMK",
@@ -134,7 +134,7 @@ server <- function(input, output, session) {
           ymax = cumsum(percent), # Compute the cumulative percentages (top of each rectangle)
           ymin = c(0, head(ymax, n=-1)), # Compute the bottom of each rectangle
           labelPosition = (ymax + ymin) / 2,
-          label = paste0(KØN, ": ", percent, "%")))
+          label = paste0(KØN, "\n", percent, "%")))
   
   output$chosen_municipality <- renderText(input$municipality)
   
@@ -187,13 +187,19 @@ server <- function(input, output, session) {
   
   output$plot_gender <- renderPlot({
     p_gender() %>%
-      ggplot(., aes(ymax=ymax, ymin=ymin, xmax=6, xmin=5, fill=KØN)) +
+      ggplot(., aes(ymax=ymax, 
+                    ymin=ymin, 
+                    xmax=4, 
+                    xmin=0.5, 
+                    fill=KØN)) +
       geom_rect() +
-      geom_text(x=1.25, aes(y=labelPosition, label=label), size=4) +
-      scale_fill_brewer(palette=3) +
-      scale_color_brewer(palette=3) +
-      coord_polar(theta="y") + # Try to remove that to understand how the chart is built initially
-      xlim(c(-1, 4)) + # Try to remove that to see how to make a pie chart
+      geom_text(x=2.3, 
+                aes(y=labelPosition, label=label), 
+                size=5, 
+                color = "white") +
+      coord_polar(theta="y") +
+      scale_fill_manual(values = c("grey35", "grey65")) +
+      xlim(c(-1, 4)) + 
       theme_void() +
       theme(legend.position = "none")
   }, alt = "Alternative text")
