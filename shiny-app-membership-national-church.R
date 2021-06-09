@@ -6,6 +6,7 @@ library(shiny)
 library(htmltools)
 library(tidyverse)
 library(Cairo)
+library(plotly)
 
 # import data from Statistic Denmark --------------------------------------
 variables <- list(
@@ -32,7 +33,7 @@ df <- danstat::get_data(table_id = "KM6",
 # Set global ggplot theme -------------------------------------------------
 
 global_theme <- theme(
-  axis.text = element_text(size = 16),
+  axis.text = element_text(size = 12),
   axis.title.x = element_blank(),
   axis.title.y = element_blank())
 
@@ -73,20 +74,20 @@ ui <- fluidPage(
             
             h2("Change in the share of the population that are members of the National Church"),
             
-            plotOutput("plot_change", width = "100%")),
+            plotlyOutput("plot_change", width = "100%")),
         
         div(class="narrow-output",
             
             h2("Share of men and women among the members of the National Church in ", textOutput("max_year_2", inline = TRUE)),
             
-            plotOutput("plot_gender", width = "100%")
+            plotlyOutput("plot_gender", width = "100%")
             ),
         
         div(class="wide-output",
             
             h2("Share of different age groups that were members of the National Church in ", textOutput("max_year_3", inline = TRUE)),
             
-            plotOutput("plot_age", width = "100%")
+            plotlyOutput("plot_age", width = "100%")
             ),
     )
   )
@@ -148,8 +149,8 @@ server <- function(input, output, session) {
     t_max_year()
   })
   
-  output$plot_change <- renderPlot({
-    p_change() %>%
+  output$plot_change <- renderPlotly({
+    ggplot_change <- p_change() %>%
       ggplot(., aes(TID, percent)) +
       geom_line(size = 2, color = "grey35") + 
       scale_y_continuous(limits = c(48, 83),
@@ -162,27 +163,29 @@ server <- function(input, output, session) {
         panel.grid.minor.x = element_blank(),
         axis.line.x = element_line(size = 0.5)
       )
-  }, 
-  alt = "Alternative text")
+    
+    ggplotly(ggplot_change)
+  })
   
-  output$plot_age <- renderPlot({
-    p_age() %>%
+  output$plot_age <- renderPlotly({
+    ggplot_age <- p_age() %>%
       ggplot(., aes(ALDER, percent)) +
       geom_col(width = 0.8) +
       coord_flip() +
-      scale_y_continuous(breaks = c(0, 20, 40, 60, 80),
+      scale_y_continuous(breaks = c(25, 50, 75),
                          labels = function(x) paste0(x, "%")) +
       theme_minimal() +
       global_theme +
       theme(
         panel.grid.major.y = element_blank(),
         panel.grid.minor.y = element_blank(),
-        panel.grid.minor.x = element_blank()) 
-    }, 
-    alt = "Alternative text")
+        panel.grid.minor.x = element_blank())
+    
+    ggplotly(ggplot_age)
+    })
   
-  output$plot_gender <- renderPlot({
-    p_gender() %>%
+  output$plot_gender <- renderPlotly({
+    ggplot_gender <- p_gender() %>%
       ggplot(., aes(ymax=ymax, 
                     ymin=ymin, 
                     xmax=4, 
@@ -198,7 +201,9 @@ server <- function(input, output, session) {
       xlim(c(-1, 4)) + 
       theme_void() +
       theme(legend.position = "none")
-  }, alt = "Alternative text")
+    
+    ggplotly(ggplot_gender)
+  })
 }
 
 shinyApp(ui, server)
