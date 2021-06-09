@@ -36,7 +36,6 @@ global_theme <- theme(
   axis.title.x = element_blank(),
   axis.title.y = element_blank())
 
-
 # Shiny app ---------------------------------------------------------------
 
 options(shiny.usecairo=TRUE) # set graphics engine to Cairo
@@ -162,10 +161,7 @@ server <- function(input, output, session) {
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
         axis.line.x = element_line(size = 0.5)
-      ) +
-      labs(
-        caption = "Data source: Statistics Denmark"
-      ) 
+      )
   }, 
   alt = "Alternative text")
   
@@ -176,8 +172,6 @@ server <- function(input, output, session) {
       coord_flip() +
       scale_y_continuous(breaks = c(0, 20, 40, 60, 80),
                          labels = function(x) paste0(x, "%")) +
-      labs(
-        caption = "Data source: Statistics Denmark") +
       theme_minimal() +
       global_theme +
       theme(
