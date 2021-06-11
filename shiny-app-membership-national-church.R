@@ -33,7 +33,7 @@ df <- danstat::get_data(table_id = "KM6",
 # Set global ggplot theme -------------------------------------------------
 
 global_theme <- theme(
-  axis.text = element_text(size = 12),
+  axis.text = element_text(size = 10),
   axis.title.x = element_blank(),
   axis.title.y = element_blank())
 
@@ -139,6 +139,10 @@ server <- function(input, output, session) {
           labelPosition = (ymax + ymin) / 2,
           label = paste0(KØN, "\n", percent, "%")))
   
+  # List with font name - https://stackoverflow.com/questions/57589929/embed-google-font-in-ggplotly-png-download
+  f <- list(family = "Roboto")
+  a <- list(tickfont = f)
+  
   output$chosen_municipality <- renderText(input$municipality)
   
   output$percent_membership <- renderText({
@@ -151,9 +155,16 @@ server <- function(input, output, session) {
   
   output$plot_change <- renderPlotly({
     ggplot_change <- p_change() %>%
-      ggplot(., aes(TID, percent)) +
-      geom_line(size = 2, color = "grey35") + 
-      scale_y_continuous(limits = c(48, 83),
+      ggplot(., aes(TID, 
+                    percent,
+                    group = 1,
+                    text = paste0(
+                      "Year: ", TID,"\n",
+                      "Percent membership: ", percent, "%")
+                    )) +
+      geom_line(size = 1, 
+                color = "grey35") + 
+      scale_y_continuous(limits = c(48, 81),
                          labels = function(x) paste0(x, "%")) +
       scale_x_continuous(breaks = scales::breaks_extended(n = 7)) +
       theme_minimal() +
@@ -164,12 +175,20 @@ server <- function(input, output, session) {
         axis.line.x = element_line(size = 0.5)
       )
     
-    ggplotly(ggplot_change)
+    ggplotly(ggplot_change, tooltip = "text") %>%
+      config(displayModeBar = FALSE) %>%
+      layout(font=f, xaxis = a, yaxis = a)
   })
   
   output$plot_age <- renderPlotly({
     ggplot_age <- p_age() %>%
-      ggplot(., aes(ALDER, percent)) +
+      ggplot(., aes(ALDER, 
+                    percent,
+                    group = 1,
+                    text = paste0(
+                      "Age group: ", ALDER,
+                      "\nPercent membership: ", percent, "%")
+                    )) +
       geom_col(width = 0.8) +
       coord_flip() +
       scale_y_continuous(breaks = c(25, 50, 75),
@@ -181,28 +200,46 @@ server <- function(input, output, session) {
         panel.grid.minor.y = element_blank(),
         panel.grid.minor.x = element_blank())
     
-    ggplotly(ggplot_age)
+    ggplotly(ggplot_age, tooltip = "text") %>%
+      config(displayModeBar = FALSE) %>%
+      layout(font=f, xaxis = a, yaxis = a)
     })
   
   output$plot_gender <- renderPlotly({
-    ggplot_gender <- p_gender() %>%
-      ggplot(., aes(ymax=ymax, 
-                    ymin=ymin, 
-                    xmax=4, 
-                    xmin=0.5, 
-                    fill=KØN)) +
-      geom_rect() +
-      geom_text(x=2.3, 
-                aes(y=labelPosition, label=label), 
-                size=5, 
-                color = "white") +
-      coord_polar(theta="y") +
-      scale_fill_manual(values = c("grey35", "grey65")) +
-      xlim(c(-1, 4)) + 
-      theme_void() +
-      theme(legend.position = "none")
+    m <- list( # Margin and padding
+      l = 5,
+      r = 5,
+      b = 5,
+      t = 5
+    )  
     
-    ggplotly(ggplot_gender)
+    colors <- c('rgb(89,89,89)', 'rgb(166,166,166)')
+    
+    fig <- plot_ly(p_gender(), labels = ~KØN, values = ~percent, 
+                     textposition = 'inside',
+                     textinfo = 'label+percent',
+                     insidetextfont = list(color = '#FFFFFF',
+                                           family = "Roboto",
+                                           size = 16),
+                     hoverinfo = 'text',
+                     text = ~paste0(KØN, "\nCount: ", total, "\n% of total percent: ", percent),
+                     marker = list(colors = colors,
+                                   line = list(color = '#FFFFFF', 
+                                               width = 1)),
+                     showlegend = FALSE) %>%
+        add_pie(hole = 0.25) %>%
+        config(displayModeBar = FALSE) %>%
+        layout(font = f,
+               xaxis = list(showgrid = FALSE, 
+                            zeroline = FALSE, 
+                            showticklabels = FALSE),
+               yaxis = list(showgrid = FALSE, 
+                            zeroline = FALSE, 
+                            showticklabels = FALSE),
+               hoverlabel = list(align = "left"),
+               margin = m)
+      
+      fig
   })
 }
 
