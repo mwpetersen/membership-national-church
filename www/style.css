@@ -67,6 +67,10 @@ a:hover {
   margin-bottom: 30px;
 }
 
+.smaller-padding {
+  padding-bottom: 0px;
+}
+
 .wide-output {
   width: 100%;
   padding: 10px 0px 20px 0px; /* Top  Right  Bottom  Left */

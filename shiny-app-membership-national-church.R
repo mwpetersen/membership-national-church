@@ -33,7 +33,9 @@ df <- danstat::get_data(table_id = "KM6",
 global_theme <- theme(
   axis.text = element_text(size = 10),
   axis.title.x = element_blank(),
-  axis.title.y = element_blank())
+  axis.title.y = element_blank(),
+  plot.background = element_rect(fill = "#fbfbfb"),
+  panel.background = element_rect(fill = "#fbfbfb"))
 
 # Shiny app ---------------------------------------------------------------
 options(shiny.usecairo=TRUE) # set graphics engine to Cairo
@@ -62,7 +64,7 @@ ui <- fluidPage(
     div(class="output-container",
         
         div(class="narrow-output center",
-            h2("Share af the population that are members of the National Church in ", textOutput("max_year_1", inline = TRUE)),
+            h2("Share of the population that are members of the National Church in ", textOutput("max_year_1", inline = TRUE)),
             
             textOutput("percent_membership")
             ), 
@@ -75,14 +77,14 @@ ui <- fluidPage(
         
         div(class="narrow-output",
             
-            h2("Share of men and women among the members of the National Church in ", textOutput("max_year_2", inline = TRUE)),
+            h2(class="smaller-padding", "Share of men and women among the members of the National Church in ", textOutput("max_year_2", inline = TRUE)),
             
             plotlyOutput("plot_gender", width = "100%")
             ),
         
         div(class="wide-output",
             
-            h2("Share of different age groups that were members of the National Church in ", textOutput("max_year_3", inline = TRUE)),
+            h2("Share of different age groups that are members of the National Church in ", textOutput("max_year_3", inline = TRUE)),
             
             plotlyOutput("plot_age", width = "100%")
             ),
@@ -207,7 +209,8 @@ server <- function(input, output, session) {
       l = 5,
       r = 5,
       b = 5,
-      t = 5
+      t = 0,
+      pad = 0
     )  
     
     colors <- c('rgb(89,89,89)', 'rgb(166,166,166)')
@@ -219,7 +222,7 @@ server <- function(input, output, session) {
                                            family = "Roboto",
                                            size = 16),
                      hoverinfo = 'text',
-                     text = ~paste0(KØN, "\nCount: ", total, "\n% of total percent: ", percent),
+                     text = ~paste0(KØN, "\nCount: ", total, "\nPercent of total: ", percent),
                      marker = list(colors = colors,
                                    line = list(color = '#FFFFFF', 
                                                width = 1)),
@@ -234,7 +237,8 @@ server <- function(input, output, session) {
                             zeroline = FALSE, 
                             showticklabels = FALSE),
                hoverlabel = list(align = "left"),
-               margin = m)
+               margin = m,
+               paper_bgcolor = "#fbfbfb")
       
       fig
   })
