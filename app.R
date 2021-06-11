@@ -176,7 +176,10 @@ server <- function(input, output, session) {
     
     ggplotly(ggplot_change, tooltip = "text") %>%
       config(displayModeBar = FALSE) %>%
-      layout(font=f, xaxis = a, yaxis = a)
+      layout(font=f, 
+             xaxis = a, 
+             yaxis = a,
+             dragmode = FALSE)
   })
   
   output$plot_age <- renderPlotly({
@@ -201,7 +204,10 @@ server <- function(input, output, session) {
     
     ggplotly(ggplot_age, tooltip = "text") %>%
       config(displayModeBar = FALSE) %>%
-      layout(font=f, xaxis = a, yaxis = a)
+      layout(font=f, 
+             xaxis = a, 
+             yaxis = a,
+             dragmode = FALSE)
     })
   
   output$plot_gender <- renderPlotly({
@@ -238,7 +244,8 @@ server <- function(input, output, session) {
                             showticklabels = FALSE),
                hoverlabel = list(align = "left"),
                margin = m,
-               paper_bgcolor = "#fbfbfb")
+               paper_bgcolor = "#fbfbfb",
+               dragmode = FALSE)
       
       fig
   })
