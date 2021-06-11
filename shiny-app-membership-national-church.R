@@ -29,19 +29,16 @@ variables <- list(
 df <- danstat::get_data(table_id = "KM6",
                         variables = variables)
 
-
 # Set global ggplot theme -------------------------------------------------
-
 global_theme <- theme(
   axis.text = element_text(size = 10),
   axis.title.x = element_blank(),
   axis.title.y = element_blank())
 
 # Shiny app ---------------------------------------------------------------
-
 options(shiny.usecairo=TRUE) # set graphics engine to Cairo
 
-municipality_list <- unique(df$KOMK)
+municipality_list <- unique(df$KOMK) 
 
 ui <- fluidPage(
   tags$head(
