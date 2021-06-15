@@ -162,7 +162,7 @@ server <- function(input, output, session) {
                       "Percent membership: ", percent, "%")
                     )) +
       geom_line(size = 1, 
-                color = "grey35") + 
+                color = "#2770d6") + 
       scale_y_continuous(limits = c(48, 81),
                          labels = function(x) paste0(x, "%")) +
       scale_x_continuous(breaks = scales::breaks_extended(n = 7)) +
@@ -191,7 +191,8 @@ server <- function(input, output, session) {
                       "Age group: ", ALDER,
                       "\nPercent membership: ", percent, "%")
                     )) +
-      geom_col(width = 0.8) +
+      geom_point(size = 2, color = "#2770d6", pch = 19) + 
+      geom_segment(aes(x=ALDER, xend=ALDER, y=0, yend=percent)) +
       coord_flip() +
       scale_y_continuous(breaks = c(25, 50, 75),
                          labels = function(x) paste0(x, "%")) +
@@ -219,7 +220,7 @@ server <- function(input, output, session) {
       pad = 0
     )  
     
-    colors <- c('rgb(89,89,89)', 'rgb(166,166,166)')
+    colors <- c('rgb(89,89,89)', 'rgb(39,112,214)')
     
     fig <- plot_ly(p_gender(), labels = ~KØN, values = ~percent, 
                      textposition = 'inside',
