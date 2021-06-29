@@ -77,17 +77,17 @@ ui <- fluidPage(
         
         div(class="narrow-output",
             
-            h2(class="smaller-padding", "Share of men and women among the members of the National Church in ", textOutput("max_year_2", inline = TRUE)),
+            h2("Share of men and women among the members of the National Church in ", textOutput("max_year_2", inline = TRUE)),
             
             plotlyOutput("plot_gender", width = "100%")
-            ),
+          ),
         
         div(class="wide-output",
             
             h2("Share of different age groups that are members of the National Church in ", textOutput("max_year_3", inline = TRUE)),
             
             plotlyOutput("plot_age", width = "100%")
-            ),
+      ),
     )
   )
 )
@@ -215,8 +215,8 @@ server <- function(input, output, session) {
     m <- list( # Margin and padding
       l = 5,
       r = 5,
-      b = 5,
-      t = 0,
+      b = 70,
+      t = 15,
       pad = 0
     )  
     
