@@ -1,4 +1,4 @@
-# membership-national-church
-Web app about the change in membership of the Danish National Church
+# Membership of the Danish National Church in Copenhagen, Aarhus and Odense
+An interactive dashboard created with the R packages Shiny, ggplot2 and Plotly. Data is from the Statistics Denmark’s API for StatBank using the R package danstat.
 
-Link to app: https://mwpetersen.shinyapps.io/membership-national-church/
+Link to dashboard: https://mwpetersen.shinyapps.io/membership-national-church/
